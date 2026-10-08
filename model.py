@@ -111,8 +111,23 @@ def should_stop(labels, depth, max_depth, min_samples_split):
     # 任意条件满足，停止分裂
     return pure or depth_reach or too_small
 
-# Step 6 - leaf_prediction (not yet solved)
-# TODO: implement
+# Step 6 - leaf_prediction
+def leaf_prediction(labels):
+    """
+    叶子节点预测：返回样本里出现最多的类别（Python原生int）
+    Args:
+        labels: array-like，当前叶子节点所有样本标签
+    Returns:
+        int: 多数类标签
+    """
+    # 1. 转成numpy整数数组
+    labels = np.asarray(labels, dtype=int)
+    # 2. 统计类别与计数
+    values, counts = np.unique(labels, return_counts=True)
+    # 3. 取计数最大的类别
+    most_common = values[np.argmax(counts)]
+    # 4. 强制转为原生Python int，避免np.int64类型bug
+    return int(most_common)
 
 # Step 7 - build_tree (not yet solved)
 # TODO: implement
