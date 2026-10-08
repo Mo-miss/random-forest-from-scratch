@@ -89,8 +89,27 @@ def best_split(features, labels, feature_indices):
                 best['score'] = score
     return best
 
-# Step 5 - should_stop (not yet solved)
-# TODO: implement
+# Step 5 - should_stop
+def should_stop(labels, depth, max_depth, min_samples_split):
+    """
+    判断决策树当前节点是否停止分裂，转为叶子节点
+    Args:
+        labels: np.ndarray, 当前节点样本标签
+        depth: int, 当前节点深度（根节点=0）
+        max_depth: int, 树允许的最大深度
+        min_samples_split: int, 继续分裂所需要的最少样本数
+    Returns:
+        bool: True → 停止分裂；False → 继续分裂
+    """
+    # 条件1：节点纯净，所有标签相同
+    pure = len(np.unique(labels)) == 1
+    # 条件2：深度达到上限
+    depth_reach = depth >= max_depth
+    # 条件3：样本数量不足
+    too_small = len(labels) < min_samples_split
+    
+    # 任意条件满足，停止分裂
+    return pure or depth_reach or too_small
 
 # Step 6 - leaf_prediction (not yet solved)
 # TODO: implement
