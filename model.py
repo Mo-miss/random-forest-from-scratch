@@ -46,10 +46,48 @@ def split_score(parent_labels, left_labels, right_labels):
     n = len(parent_labels)
     w_l = len(left_labels) / n
     w_r = len(right_labels) / n
-    return impurity(parent) - (w_l * impurity(left_labels) + w_r * impurity(right_labels))
+    return impurity(parent_labels) - (w_l * impurity(left_labels) + w_r * impurity(right_labels))
 
-# Step 4 - best_split (not yet solved)
-# TODO: implement
+# Step 4 - best_split
+import numpy as np
+
+def best_split(features, labels, feature_indices):
+    """
+    寻找最优特征+阈值划分
+    Args:
+        features: np.ndarray shape (n_samples, n_dims)
+        labels: np.ndarray shape (n_samples,)
+        feature_indices: list，需要遍历的特征索引
+    Returns:
+        dict: {'feature_index': int|None, 'threshold': float|None, 'score': float}
+    """
+    # 初始化最优记录
+    best = {
+        'feature_index': None,
+        'threshold': None,
+        'score': 0.0
+    }
+
+    for fi in feature_indices:
+        # 获取该特征列，去重并排序
+        col = features[:, fi]
+        unique_vals = np.unique(col)
+        # 生成相邻中点作为候选阈值
+        thresholds = (unique_vals[:-1] + unique_vals[1:]) / 2
+
+        for t in thresholds:
+            lf, ll, rf, rl = split_dataset(features, labels, fi, t)
+            # 跳过任意一侧为空的无效划分
+            if len(ll) == 0 or len(rl) == 0:
+                continue
+            # 计算分裂增益
+            score = split_score(labels, ll, rl)
+            # 更新最优
+            if score > best['score']:
+                best['feature_index'] = fi
+                best['threshold'] = t
+                best['score'] = score
+    return best
 
 # Step 5 - should_stop (not yet solved)
 # TODO: implement
