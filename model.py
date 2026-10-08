@@ -129,8 +129,50 @@ def leaf_prediction(labels):
     # 4. 强制转为原生Python int，避免np.int64类型bug
     return int(most_common)
 
-# Step 7 - build_tree (not yet solved)
-# TODO: implement
+# Step 7 - build_tree
+def build_tree(features, labels, max_depth=10, min_samples_split=2, feature_subset=None, depth=0):
+
+    # Step1 判断是否停止，生成叶子
+    if should_stop(labels, depth, max_depth, min_samples_split):
+        pred = leaf_prediction(labels)
+        return {"leaf": True, "prediction": pred}
+    
+    # Step2 构造候选特征列表
+    if feature_subset is None:
+        candidate_features = list(range(features.shape[1]))
+    else:
+        candidate_features = list(feature_subset)
+    
+    # Step3 寻找最优分裂
+    split_result = best_split(features, labels, candidate_features)
+    feat_idx = split_result["feature_index"]
+    threshold = split_result["threshold"]
+    
+    # 找不到有效分裂，回退叶子
+    if feat_idx is None:
+        pred = leaf_prediction(labels)
+        return {"leaf": True, "prediction": pred}
+    
+    # Step4 划分数据集
+    left_feat, left_lab, right_feat, right_lab = split_dataset(features, labels, feat_idx, threshold)
+    
+    # Step5 任意一侧为空，不能分裂，返回叶子
+    if len(left_lab) == 0 or len(right_lab) == 0:
+        pred = leaf_prediction(labels)
+        return {"leaf": True, "prediction": pred}
+    
+    # 递归构建左右子树，depth+1，feature_subset继续向下传递！
+    left_node = build_tree(left_feat, left_lab, max_depth, min_samples_split, feature_subset, depth+1)
+    right_node = build_tree(right_feat, right_lab,  max_depth, min_samples_split, feature_subset, depth+1)
+    
+    # 返回内部节点字典
+    return {
+        "leaf": False,
+        "feature_index": feat_idx,
+        "threshold": threshold,
+        "left": left_node,
+        "right": right_node
+    }
 
 # Step 8 - predict_example_tree (not yet solved)
 # TODO: implement
