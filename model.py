@@ -193,8 +193,19 @@ def predict_example_tree(tree, example):
     else:
         return predict_example_tree(tree["right"], example)
 
-# Step 9 - predict_tree (not yet solved)
-# TODO: implement
+# Step 9 - predict_tree
+def predict_tree(tree, features):
+    """Predict class labels for every row of `features` using a fitted decision tree.
+
+    tree: dict returned by build_tree
+    features: np.ndarray of shape (n, d)
+    returns: np.ndarray of shape (n,) with integer class labels
+    """
+    # TODO: return predicted class for each row of features using the fitted tree.
+    preds = []
+    for row in features:
+        preds.append(predict_example_tree(tree, row))
+    return np.array(preds, dtype=int)
 
 # Step 10 - bootstrap_sample (not yet solved)
 # TODO: implement
