@@ -12,7 +12,7 @@ python scaffold.py
 
 - [x] **1.** impurity
 - [x] **2.** split_dataset
-- [ ] **3.** split_score
+- [x] **3.** split_score
 - [ ] **4.** best_split
 - [ ] **5.** should_stop
 - [ ] **6.** leaf_prediction
