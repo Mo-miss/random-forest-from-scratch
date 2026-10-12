@@ -288,8 +288,25 @@ def train_forest(features, labels, num_trees=10, max_depth=10, min_samples_split
         })
     return forest
 
-# Step 13 - combine_predictions (not yet solved)
-# TODO: implement
+# Step 13 - combine_predictions
+def combine_predictions(tree_predictions):
+    # TODO: aggregate the per-tree predictions of an ensemble into one prediction per example.
+    num_trees, n = tree_predictions.shape
+    output = np.empty(n, dtype=int)
+
+    for i in range(n):
+        # 取出第i个样本：所有树对该样本的投票（取第i列）
+        votes = tree_predictions[:, i]
+        labels, counts = np.unique(votes, return_counts=True)
+        
+        max_count = np.max(counts)
+        # 拿到所有得票等于最高票数的候选（处理平局）
+        tied_candidates = labels[counts == max_count]
+        # 平局策略：选数值最小的标签
+        final_label = np.min(tied_candidates)
+        output[i] = final_label
+    
+    return output
 
 # Step 14 - predict_forest (not yet solved)
 # TODO: implement
