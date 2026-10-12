@@ -233,8 +233,60 @@ def feature_subset(num_features, num_to_pick, rng):
     feature_indices = np.asarray(feature_indices, dtype=int)
     return feature_indices
 
-# Step 12 - train_forest (not yet solved)
-# TODO: implement
+# Step 12 - train_forest
+import numpy as np
+
+def train_forest(features, labels, num_trees=10, max_depth=10, min_samples_split=2, num_features_per_split=None, random_state=0):
+    # TODO: grow num_trees decision trees on bootstrap samples with random feature subsets.
+    """
+    训练随机森林
+    Args:
+        features: (n, d) 训练特征
+        labels: (n,) 标签
+        num_trees: 树的总棵数 T
+        num_features_per_split: 每次分裂候选特征数；None则使用sqrt(d)默认值
+        max_depth: 单棵树最大深度，透传给build_tree
+        min_samples_split: 节点分裂最小样本数，透传给build_tree
+        random_state: 随机种子，保证复现
+    Returns:
+        list[dict]，每一项 {'tree': tree_dict, 'feature_indices': np.ndarray}
+    """
+    n, d = features.shape
+
+    # -------- 1. 只创建一次RNG，循环外部！ --------
+    rng = np.random.default_rng(random_state)
+
+    # -------- 2. 在循环外，计算每轮选取特征的数量 --------
+    if num_features_per_split is None:
+        num_features_per_split = max(1, int(round(np.sqrt(d))))
+    
+    forest = []
+
+    # -------- 3. 循环训练每一棵树 --------
+    for _ in range(num_trees):
+        # ① bootstrap 行采样（有放回）
+        X_boot, y_boot = bootstrap_sample(features, labels, rng)
+        
+        # ② 随机采样特征列下标（无放回）
+        feat_idx = feature_subset(
+            num_features=d,
+            num_to_pick=num_features_per_split,
+            rng=rng
+        )
+        
+        # ③ 训练单棵树，传入feature_subset，透传超参
+        tree = build_tree(
+            X_boot, y_boot,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            feature_subset=feat_idx
+        )
+
+        forest.append({
+            "tree": tree,
+            "feature_indices": feat_idx
+        })
+    return forest
 
 # Step 13 - combine_predictions (not yet solved)
 # TODO: implement
