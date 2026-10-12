@@ -218,8 +218,20 @@ def bootstrap_sample(features, labels, rng):
     boot_labels = labels[idx]
     return boot_features, boot_labels
 
-# Step 11 - feature_subset (not yet solved)
-# TODO: implement
+# Step 11 - feature_subset
+import numpy as np
+
+def feature_subset(num_features, num_to_pick, rng):
+    # TODO: return num_to_pick distinct random feature indices from range(num_features) using rng.
+    # 1. 校验输入范围
+    assert 1 <= num_to_pick <= num_features, "num_to_pick必须介于1和总特征数之间"
+    
+    # 无放回随机采样，推荐rng.choice
+    feature_indices = rng.choice(num_features, size=num_to_pick, replace=False)
+    
+    # 确保是int类型一维数组
+    feature_indices = np.asarray(feature_indices, dtype=int)
+    return feature_indices
 
 # Step 12 - train_forest (not yet solved)
 # TODO: implement
