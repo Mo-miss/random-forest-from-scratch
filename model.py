@@ -308,8 +308,40 @@ def combine_predictions(tree_predictions):
     
     return output
 
-# Step 14 - predict_forest (not yet solved)
-# TODO: implement
+# Step 14 - predict_forest
+def predict_forest(forest, features):
+    # TODO: predict classes for a dataset using the whole trained forest.
+    """
+    随机森林顶层预测函数
+    Args:
+        forest: 训练完成的森林列表，每个元素 dict: {"tree":tree_dict, "feature_indices":np.ndarray}
+        features: np.ndarray shape (n_samples, d) 待预测样本，完整全部特征矩阵
+    Returns:
+        np.ndarray[int], shape (n_samples,) 每个样本最终预测标签
+    """
+    n_samples = features.shape[0]
+    num_trees = len(forest)
+    
+    # 存放每棵树的预测：行=树，列=样本 → shape (num_trees, n_samples)
+    tree_pred_stack = np.empty((num_trees, n_samples), dtype=int)
+
+    for tree_idx, entry in enumerate(forest):
+        single_tree = entry["tree"]
+        feat_idx = entry["feature_indices"]
+        
+        # 两种实现风格，必须和build_tree设计严格匹配：
+        # 方案A：build_tree内部接收完整X，只在分裂时用feature_subset
+        # → predict_tree直接传入完整features，不需要切片！（推荐，我们前面代码采用这套）
+        pred_one_tree = predict_tree(single_tree, features)
+        
+        # 方案B：如果训练build_tree时传入的是切片 X_boot[:, feat_idx]，
+        # 预测就必须切片： pred_one_tree = predict_tree(single_tree, features[:, feat_idx])
+        
+        tree_pred_stack[tree_idx, :] = pred_one_tree
+
+    # 调用多数投票聚合
+    final_pred = combine_predictions(tree_pred_stack)
+    return final_pred
 
 # Step 15 - accuracy (not yet solved)
 # TODO: implement
